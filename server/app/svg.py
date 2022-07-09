@@ -1,7 +1,9 @@
+import json
+
 from django.http import HttpResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.viewsets import GenericViewSet
-
+import requests
 from modals.models import Svg
 from modals.serializers import SvgSerializer, QuerySerializer
 from .result import JSONResponse, MyPagination
@@ -31,11 +33,18 @@ class SvgView(GenericViewSet):
 
     def post(self, request):
         data = JSONParser().parse(request)
+        params = {'content': data.get('content')}
+        data_json = json.dumps(params)
+        headers = {'Content-type': 'application/json'}
+        response = requests.post("http://127.0.0.1:8888/svg/optimise/", data=data_json, headers=headers)
+        if response.status_code != 200:
+            return JSONResponse(response.json(), code=400, message="svg优化失败")
+        data["content"] = response.json().get('data')
         serializer = SvgSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return JSONResponse(serializer.data, code=200, message="创建成功")
-        return JSONResponse(serializer.errors, code=400, message="缺少参数")
+        return JSONResponse(serializer.errors, code=400, message="创建失败")
 
     def delete(self, request, pk=None):
 

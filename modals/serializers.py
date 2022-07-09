@@ -2,34 +2,13 @@ from abc import ABC
 
 from rest_framework import serializers
 
-from modals.models import Svg, Note, NoteCategory, File
+from modals.models import Svg, File, MemorandumCategory, Memorandum
 
 
 class SvgSerializer(serializers.ModelSerializer):
     class Meta:
         model = Svg
         fields = '__all__'
-
-
-class NoteSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Note
-        fields = '__all__'
-
-
-class NoteCategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NoteCategory
-        fields = ('id', 'name')
-
-
-class NoteCategoryDetailSerializer(serializers.ModelSerializer):
-    notes = NoteSerializer(many=True)
-
-    class Meta:
-        model = NoteCategory
-        fields = ('id', 'name', 'notes')
-
 
 class FileUploadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,3 +32,26 @@ class QuerySerializer(serializers.Serializer):
     page = serializers.IntegerField(min_value=1, allow_null=False, required=True)
     size = serializers.IntegerField(min_value=10, max_value=100, allow_null=False, required=True)
     search = serializers.CharField(allow_blank=True, allow_null=True, required=True)
+
+
+class MemorandumSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Memorandum
+        fields = ('id', 'name', 'time', 'category')
+
+
+class MemorandumCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Memorandum
+        fields = ('name', 'category')
+
+class MemorandumCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MemorandumCategory
+        fields = '__all__'
+
+
+class MemorandumDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Memorandum
+        fields = '__all__'
